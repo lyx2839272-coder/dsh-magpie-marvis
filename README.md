@@ -52,8 +52,8 @@ config.example.json         网关配置模板
 
 ## 4. 依赖
 
-- **Python 3.9+** 与 `websockets`（`pip install websockets`）
-- **Node.js 18+**（内置 fetch / WebSocket / crypto）
+- **Python 3.9+** 与 `websockets`（`pip install "websockets>=12"`；代码同时兼容 12-13 的 extra_headers 与 14+ 的 additional_headers）
+- **Node.js 22+**（login.mjs 依赖全局 WebSocket；内置 fetch / crypto）
 - **Google Chrome / Chromium**（登录抓包用，可 `export CHROME_BIN=` 指定路径）
 - （可选，auth/ 与 scripts/ 需要）**magpie + magpie-marvis 插件**：本方案的换票/探测复用了
   `magpie-marvis` 的协议头与指纹实现。没装它时，路线 A 的网关仍可独立工作，只要你有握手模板。
@@ -73,7 +73,7 @@ config.example.json         网关配置模板
 ```bash
 # 1) 配置
 cp config.example.json config.json
-# 编辑 config.json：填 marvis_ws_url / model_name / handshake_file / frames_file
+# 编辑 config.json：填 marvis_ws_url / model_name / handshake_file / frames_file（model_name 为示例，按你账号 /v1/models 改）
 
 # 2) 启动网关（默认 127.0.0.1:3499）
 pip install websockets
@@ -101,7 +101,7 @@ bash scripts/watch.sh                         # 每 20 分钟探测，恢复写 
 
 把 `dsh-go-plugin/` 放进 dsh-go 的插件目录（或按 dsh-go 的插件安装机制加载）：
 它在手机界面加一个「Magpie」胶囊 + 面板，读 `$MAGPIE_HOME/{logins,quotas,quota-history}.json` 与本地网关
-（默认 `http://127.0.0.1:3425`，可用 `MAGPIE_GW_URL` 覆盖）显示状态、余额和测模型结果。
+（默认 `http://127.0.0.1:3425`，可用 `MAGPIE_GW_URL` 覆盖）显示状态、余额和测模型结果。注：3425 是 magpie 自带网关，本仓库 marvis_gateway.py 默认 3499，两者不同。
 
 ## 7. 安全与合规
 

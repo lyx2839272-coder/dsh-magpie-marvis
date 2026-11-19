@@ -50,8 +50,8 @@ config.example.json         gateway config template
 
 ## 4. Requirements
 
-- **Python 3.9+** with `websockets` (`pip install websockets`)
-- **Node.js 18+** (built-in fetch / WebSocket / crypto)
+- **Python 3.9+** with `websockets` (`pip install "websockets>=12"`; code handles both 12-13 extra_headers and 14+ additional_headers)
+- **Node.js 22+** (login.mjs needs global WebSocket; built-in fetch / crypto)
 - **Google Chrome / Chromium** (for login capture; override with CHROME_BIN)
 - (optional, for auth/ and scripts/) **magpie + magpie-marvis plugin**: token exchange & probing reuse
   its protocol headers and fingerprint. Route A works standalone if you already have the handshake files.
@@ -94,7 +94,7 @@ bash scripts/watch.sh
 
 Drop dsh-go-plugin/ into your dsh-go plugin directory. It adds a "Magpie" capsule + panel that reads
 $MAGPIE_HOME/{logins,quotas,quota-history}.json and the local gateway (http://127.0.0.1:3425,
-override with MAGPIE_GW_URL).
+override with MAGPIE_GW_URL). Note: 3425 is magpie's own gateway; this repo's marvis_gateway.py defaults to 3499 — they differ.
 
 ## 7. Security & compliance
 

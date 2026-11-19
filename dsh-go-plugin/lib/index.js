@@ -2,9 +2,9 @@
 //
 // 数据全部来自本机真实状态，不编：
 //   · 网关 http://127.0.0.1:3425/v1/models  —— 通不通、有几个模型
-//   · /root/.config/magpie/logins.json      —— 登录的是哪个号
-//   · /root/.config/magpie/quotas.json      —— 剩余额度（magpie 每次请求后自己刷新）
-//   · /root/.config/magpie/quota-history.json —— 额度采样历史（画曲线）
+//   · $MAGPIE_HOME/logins.json      —— 登录的是哪个号
+//   · $MAGPIE_HOME/quotas.json      —— 剩余额度（magpie 每次请求后自己刷新）
+//   · $MAGPIE_HOME/quota-history.json —— 额度采样历史（画曲线）
 //   · ./state.json                          —— 上一次实测每个模型的结果（本插件自己写）
 //
 // 只读本地，不外发；点「测模型」才会真的向上游发一条最小请求。
@@ -23,6 +23,7 @@ import {
   unwatchFile
 } from 'node:fs'
 import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 
 export const name = 'local-magpie'
@@ -41,7 +42,7 @@ const PROVIDERS = {
   workbuddy: { prefix: 'workbuddy/', label: 'WorkBuddy', title: 'WorkBuddy', window: 'Total credits', unit: 'credits', home: 'workbuddy' },
   'qoder-cn': { prefix: 'qoder-cn/', label: 'Qoder CN', title: 'Qoder CN', window: 'Total credits', unit: 'credits', home: 'qoder-cn' }
 }
-const PROVIDER_FILE = new URL('../active-provider.json', import.meta.url).pathname
+const PROVIDER_FILE = fileURLToPath(new URL('../active-provider.json', import.meta.url))
 /** 记住面板里上次选的 provider，重启不丢；没存过就默认 WorkBuddy（用户主力额度就在这） */
 let activeProvider = (() => {
   try {
@@ -56,14 +57,15 @@ const provOf = () => PROVIDERS[activeProvider] ?? PROVIDERS.raccoon
 /** 胶囊重推：切换 provider 后立刻刷新，不用等额度文件变化 */
 const stripPushers = new Set()
 const HISTORY = MAGPIE_HOME + '/quota-history.json'
-const STATE = new URL('../state.json', import.meta.url).pathname
+const STATE = fileURLToPath(new URL('../state.json', import.meta.url))
 
 /** 网关校验节奏：60 秒一次（额度是文件驱动，不跟这个走） */
 const PROBE_TTL = 60_000
 /** 网关探不通时只缓存 5 秒，好让它恢复后马上被看到 */
 const PROBE_FAIL_TTL = 5_000
 
-/** 显示名（截短，手机小屏），顺序 = 面板里的顺序 */
+/** 显示名（截短，手机小屏），顺序 = 面板里的顺序。
+ * 下方键名是本机账号下的模型 ID，仅示例，按你自己 /v1/models 返回改。 */
 const LABELS = {
   'marvis/deepseek-v4-1-flash-261017': 'DS V4.1 Flash',
   'workbuddy/deepseek-v4-pro': 'DS V4 Pro · WB',
@@ -365,8 +367,10 @@ async function quotaFromGateway(p) {
 
 /** 拉起网关（start-gateway.sh 内部已 setsid，脱离引擎进程组） */
 function bootGateway() {
+  const script = process.env.START_GATEWAY_SH
+  if (!script) return false
   try {
-    spawn('sh', [process.env.START_GATEWAY_SH || '/root/workspace/marvis-login/start-gateway.sh'], {
+    spawn('sh', [script], {
       detached: true,
       stdio: 'ignore'
     }).unref()

@@ -62,7 +62,11 @@ async def chat_once(prompt):
     sid, tok = creds(); conn = load_conn(); conn['id'] = str(uuid.uuid4())
     ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
     hdrs = [("sessionId", sid), ("token", tok), ("platform", "mobile"), ("role", "operator"), ("version", str(int(time.time()*1000)))]
-    async with websockets.connect(URL, extra_headers=hdrs, ssl=ctx, open_timeout=10) as ws:
+    try:
+        _cm = websockets.connect(URL, additional_headers=hdrs, ssl=ctx, open_timeout=10)
+    except TypeError:
+        _cm = websockets.connect(URL, extra_headers=hdrs, ssl=ctx, open_timeout=10)
+    async with _cm as ws:
         await ws.send(json.dumps(conn)); await asyncio.wait_for(ws.recv(), timeout=8)
         rid = str(uuid.uuid4())
         await ws.send(json.dumps({"type":"req","id":rid,"method":"chat.send","params":{"sessionKey":"agent:main:main","message":prompt}}))
