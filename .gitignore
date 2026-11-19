@@ -1,0 +1,17 @@
+# 凭证 / 运行态（绝不提交）
+config.json
+marvis-acct.json
+plugin-auth.json
+auth/*.local.json
+*.log
+*.out
+callback.txt
+marvis-callback.txt
+handshake.log
+frames.log
+*.png
+node_modules/
+state.json
+active-provider.json
+__pycache__/
+.DS_Store

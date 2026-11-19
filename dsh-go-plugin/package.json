@@ -1,0 +1,36 @@
+{
+  "name": "local-magpie",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "dshGo": {
+    "v": 1,
+    "title": { "zh": "Magpie", "en": "Magpie" },
+    "icon": "cloud",
+    "contributes": {
+      "composer.actions": [
+        { "id": "open-magpie", "label": { "zh": "Magpie", "en": "Magpie" }, "icon": "cloud" }
+      ],
+      "composer.strip": [
+        { "id": "magpie-state", "icon": "cloud", "panel": "magpie" }
+      ],
+      "panels": [
+        {
+          "id": "magpie",
+          "title": { "zh": "Magpie 网关", "en": "Magpie gateway" },
+          "icon": "cloud",
+          "placement": ["session.tab", "features"]
+        }
+      ]
+    }
+  }
+}

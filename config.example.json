@@ -1,0 +1,10 @@
+{
+  "gateway": {
+    "host": "127.0.0.1",
+    "port": 3499,
+    "marvis_ws_url": "wss://REPLACE_WITH_MARVIS_WS_HOST:PORT/",
+    "model_name": "REPLACE_WITH_MODEL_ID",
+    "handshake_file": "./handshake.log",
+    "frames_file": "./frames.log"
+  }
+}
